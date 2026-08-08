@@ -25,21 +25,6 @@ After downloading the AID dataset, place the selected class folders inside:
 data/raw/AID/
 ```
 
-The expected folder structure is:
-
-```text
-data/raw/AID/
-├── Airport/
-├── Beach/
-├── DenseResidential/
-├── Desert/
-├── Farmland/
-├── Forest/
-├── Industrial/
-├── Mountain/
-├── River/
-└── Stadium/
-```
 
 The fixed training, validation, and test split files are included in `data/splits/`. These files ensure that all models use the same data partitions for a fair comparison.
 
@@ -54,6 +39,18 @@ The project includes the following CNN models:
 - **Model E — Custom Deep Light-Regularized CNN:** four convolutional blocks with lighter regularization.
 
 Additional experiments using Early Stopping and learning-rate reduction are included in separate notebooks.
+
+## Research Inspiration
+
+To better understand the methods previously applied to the AID dataset, we reviewed published research on aerial scene classification using the same dataset.
+
+During this review, we identified the work of Das et al. (2026), which applies multi-scale feature fusion to capture aerial image features at different spatial scales. This study inspired us to explore the same general concept by designing a simpler CNN with parallel 3×3 and 5×5 convolutional branches.
+
+The multi-scale model used in this project was developed from scratch and does not reproduce the Aerial-Y-Net architecture or its spatial attention mechanism.
+
+## Reference
+
+Das, S., Ghosh, S., & Chatterjee, A. (2026). *Revisiting Aerial Scene Classification on the AID Benchmark*. arXiv:2601.18263. https://arxiv.org/abs/2601.18263
 
 ## Main Results
 
@@ -98,18 +95,6 @@ Install the required dependencies from the project directory:
 ```bash
 uv sync
 ```
-
-## Running the Notebooks
-
-Start Jupyter Notebook using:
-
-```bash
-uv run jupyter notebook
-```
-
-The raw AID images must be available under `data/raw/AID/` to rerun data preparation or model training.
-
-The trained models and saved results can still be used when the raw dataset is not included.
 
 ## Running the Application
 
