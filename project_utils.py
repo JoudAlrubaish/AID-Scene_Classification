@@ -212,3 +212,79 @@ def build_cnn(num_classes, config):
         outputs,
         name=config["name"],
     )
+def build_multiscale_cnn(num_classes, config):
+    """
+    Build a custom multi-scale CNN from scratch.
+
+    Parallel convolutional branches use different kernel
+    sizes to capture local details and wider spatial patterns.
+    """
+    inputs = tf.keras.Input(
+        shape=(*IMG_SIZE, 3)
+    )
+
+    x = tf.keras.layers.Rescaling(
+        1.0 / 255
+    )(inputs)
+
+    # Initial convolutional block
+    x = tf.keras.layers.Conv2D(
+        filters=config["stem_filters"],
+        kernel_size=3,
+        padding="same",
+    )(x)
+
+    x = tf.keras.layers.Activation("relu")(x)
+    x = tf.keras.layers.MaxPooling2D()(x)
+
+    # Multi-scale convolutional branches
+    branches = []
+
+    for kernel_size in config["kernel_sizes"]:
+        branch = tf.keras.layers.Conv2D(
+            filters=config["branch_filters"],
+            kernel_size=kernel_size,
+            padding="same",
+            name=f"branch_{kernel_size}x{kernel_size}",
+        )(x)
+
+        branch = tf.keras.layers.Activation(
+            "relu"
+        )(branch)
+
+        branches.append(branch)
+
+    # Combine multi-scale feature maps
+    x = tf.keras.layers.Concatenate(
+        name="multiscale_concatenate"
+    )(branches)
+
+    x = tf.keras.layers.MaxPooling2D()(x)
+
+    # Deeper feature extraction
+    x = tf.keras.layers.Conv2D(
+        filters=config["final_filters"],
+        kernel_size=3,
+        padding="same",
+    )(x)
+
+    x = tf.keras.layers.Activation("relu")(x)
+    x = tf.keras.layers.MaxPooling2D()(x)
+
+    x = tf.keras.layers.GlobalAveragePooling2D()(x)
+
+    x = tf.keras.layers.Dense(
+        units=config["dense_units"],
+        activation="relu",
+    )(x)
+
+    outputs = tf.keras.layers.Dense(
+        num_classes,
+        activation="softmax",
+    )(x)
+
+    return tf.keras.Model(
+        inputs,
+        outputs,
+        name=config["name"],
+    )
